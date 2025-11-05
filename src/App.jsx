@@ -1,51 +1,56 @@
 import React, { useMemo, useState } from 'react';
 import TabBar from './components/TabBar';
 import HomeView from './components/HomeView';
-import CommunitiesView from './components/CommunitiesView';
-import PaymentsView from './components/PaymentsView';
 import ProfileView from './components/ProfileView';
+
+function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
 
 export default function App() {
   const [tab, setTab] = useState('home');
+  const [subscribedPlan, setSubscribedPlan] = useState(null);
 
-  // Mocked events & meetings provided by admin
-  const events = useMemo(
-    () => [
-      { title: 'Yoga Class', date: new Date().toISOString(), time: '07:00 AM', community: 'Yoga Enthusiasts', description: 'Morning Vinyasa Flow' },
-      { title: 'Tech Talk: AI Trends', date: addDays(new Date(), 2).toISOString(), time: '06:00 PM', community: 'Tech Talks' },
-      { title: 'Community Planning', date: addDays(new Date(), 5).toISOString(), time: '04:00 PM', community: 'Neighborhood Council' },
-      { title: 'Book Club: Dune', date: addDays(new Date(), 5).toISOString(), time: '08:00 PM', community: 'Book Club' },
-      { title: 'Weekend Yoga', date: addDays(new Date(), 6).toISOString(), time: '09:00 AM', community: 'Yoga Enthusiasts' },
-    ],
-    []
-  );
+  const events = useMemo(() => {
+    const base = new Date();
+    return [
+      { title: 'Community Kickoff', type: 'Event', date: addDays(base, 0), time: '6:00 PM', description: 'Welcome session for new members.' },
+      { title: 'Design Standup', type: 'Meeting', date: addDays(base, 1), time: '9:30 AM' },
+      { title: 'Yoga Class', type: 'Event', date: addDays(base, 3), time: '7:00 AM' },
+      { title: 'Mentor 1:1', type: 'Meeting', date: addDays(base, 7), time: '2:00 PM' },
+    ];
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-indigo-50">
-      <header className="sticky top-0 z-10 bg-white/70 backdrop-blur border-b border-gray-200">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold tracking-tight text-gray-900">Community Hub</span>
-            <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">SaaS</span>
+    <div className="min-h-screen bg-gray-50 pb-16">
+      <header className="sticky top-0 z-20 bg-white/70 backdrop-blur border-b border-gray-200">
+        <div className="mx-auto max-w-4xl px-4 py-3 flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold text-gray-900">Community Hub</h1>
+            <p className="text-xs text-gray-600">Events • Meetings • Plans</p>
           </div>
-          <div className="text-xs text-gray-500">Manage communities with ease</div>
+          {subscribedPlan && (
+            <span className="px-2.5 py-1 text-xs rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">{subscribedPlan.toUpperCase()} member</span>
+          )}
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 pb-24 pt-6">
-        {tab === 'home' && <HomeView events={events} />}
-        {tab === 'communities' && <CommunitiesView />}
-        {tab === 'payments' && <PaymentsView />}
-        {tab === 'profile' && <ProfileView />}
+      <main className="mx-auto max-w-4xl px-4 py-6">
+        {tab === 'home' && (
+          <HomeView
+            events={events}
+            subscribedPlan={subscribedPlan}
+            onSubscribe={(plan) => setSubscribedPlan(plan)}
+          />
+        )}
+        {tab === 'profile' && (
+          <ProfileView subscribedPlan={subscribedPlan} />
+        )}
       </main>
 
-      <TabBar currentTab={tab} onChange={setTab} />
+      <TabBar current={tab} onChange={setTab} />
     </div>
   );
-}
-
-function addDays(date, days = 0) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
 }
