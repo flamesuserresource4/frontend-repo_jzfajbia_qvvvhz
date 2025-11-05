@@ -1,28 +1,51 @@
-import { useState } from 'react'
+import React, { useMemo, useState } from 'react';
+import TabBar from './components/TabBar';
+import HomeView from './components/HomeView';
+import CommunitiesView from './components/CommunitiesView';
+import PaymentsView from './components/PaymentsView';
+import ProfileView from './components/ProfileView';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [tab, setTab] = useState('home');
+
+  // Mocked events & meetings provided by admin
+  const events = useMemo(
+    () => [
+      { title: 'Yoga Class', date: new Date().toISOString(), time: '07:00 AM', community: 'Yoga Enthusiasts', description: 'Morning Vinyasa Flow' },
+      { title: 'Tech Talk: AI Trends', date: addDays(new Date(), 2).toISOString(), time: '06:00 PM', community: 'Tech Talks' },
+      { title: 'Community Planning', date: addDays(new Date(), 5).toISOString(), time: '04:00 PM', community: 'Neighborhood Council' },
+      { title: 'Book Club: Dune', date: addDays(new Date(), 5).toISOString(), time: '08:00 PM', community: 'Book Club' },
+      { title: 'Weekend Yoga', date: addDays(new Date(), 6).toISOString(), time: '09:00 AM', community: 'Yoga Enthusiasts' },
+    ],
+    []
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-white to-indigo-50">
+      <header className="sticky top-0 z-10 bg-white/70 backdrop-blur border-b border-gray-200">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+          <div className="flex items-baseline gap-2">
+            <span className="text-lg font-bold tracking-tight text-gray-900">Community Hub</span>
+            <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">SaaS</span>
+          </div>
+          <div className="text-xs text-gray-500">Manage communities with ease</div>
         </div>
-      </div>
+      </header>
+
+      <main className="mx-auto max-w-5xl px-4 pb-24 pt-6">
+        {tab === 'home' && <HomeView events={events} />}
+        {tab === 'communities' && <CommunitiesView />}
+        {tab === 'payments' && <PaymentsView />}
+        {tab === 'profile' && <ProfileView />}
+      </main>
+
+      <TabBar currentTab={tab} onChange={setTab} />
     </div>
-  )
+  );
 }
 
-export default App
+function addDays(date, days = 0) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
